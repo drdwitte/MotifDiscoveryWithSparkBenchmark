@@ -1,5 +1,6 @@
-package datastructures;
+package datastructures.search;
 
+import datastructures.indexing.DSNavigator;
 import models.alphabets.Alphabet;
 import models.alphabets.CharacterIterator;
 import toolbox.NotImplementedException;

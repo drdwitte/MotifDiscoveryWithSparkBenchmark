@@ -1,9 +1,9 @@
 package motifalgorithms;
 
-import datastructures.DSNavigator;
-import datastructures.DiscoveryStructure;
-import datastructures.SearchSpace;
-import datastructures.SearchSpaceNavigator;
+import datastructures.indexing.DSNavigator;
+import datastructures.indexing.DiscoveryStructure;
+import datastructures.search.SearchSpace;
+import datastructures.search.SearchSpaceNavigator;
 import models.motifs.Pattern;
 import motifconservation.INScore;
 import motifconservation.INScoreCalculator;

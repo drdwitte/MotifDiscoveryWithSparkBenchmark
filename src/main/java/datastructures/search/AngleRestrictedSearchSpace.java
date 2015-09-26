@@ -1,11 +1,11 @@
-package datastructures;
+package datastructures.search;
 
 import toolbox.NotImplementedException;
 
 /**
  * Created by ddewitte on 25.09.15.
  */
-public class ContentShapedSearchSpace implements SearchSpace {
+public class AngleRestrictedSearchSpace implements SearchSpace {
 
 
     @Override

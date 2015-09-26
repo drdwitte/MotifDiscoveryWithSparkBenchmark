@@ -1,4 +1,4 @@
-package datastructures;
+package datastructures.indexing;
 
 import models.motifs.Pattern;
 import motifconservation.INInfo;

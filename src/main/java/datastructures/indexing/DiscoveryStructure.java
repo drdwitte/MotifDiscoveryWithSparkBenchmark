@@ -1,4 +1,4 @@
-package datastructures;
+package datastructures.indexing;
 
 /**
  * Created by ddewitte on 23.09.15.

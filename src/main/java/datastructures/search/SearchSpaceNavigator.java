@@ -1,6 +1,6 @@
-package datastructures;
+package datastructures.search;
 
-import datastructures.DSNavigator;
+import datastructures.indexing.DSNavigator;
 
 /**
  * Created by ddewitte on 23.09.15.

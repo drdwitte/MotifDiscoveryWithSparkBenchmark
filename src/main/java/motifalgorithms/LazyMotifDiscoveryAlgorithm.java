@@ -1,10 +1,7 @@
 package motifalgorithms;
 
-import datastructures.DiscoveryStructure;
-import datastructures.SearchSpace;
 import models.motifs.Pattern;
 import motifconservation.INScore;
-import motifconservation.INScoreCalculator;
 import scala.Tuple2;
 
 /**
