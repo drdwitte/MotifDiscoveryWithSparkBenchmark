@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 public class CharacterIterator implements Iterator<Character> {
 
-	private int pos = 0;
-	private String text;
+	protected int pos = 0;
+	protected String text;
 
 	/**
 	 * Constructor
@@ -45,7 +45,12 @@ public class CharacterIterator implements Iterator<Character> {
 		return text.charAt(0);
 	}
 
+	/**
+	 *
+	 * @return current character in iteration
+	 */
 	public char current(){
 		return text.charAt(pos);
 	}
+
 }

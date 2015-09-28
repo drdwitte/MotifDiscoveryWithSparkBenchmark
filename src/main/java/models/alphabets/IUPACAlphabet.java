@@ -14,7 +14,7 @@ public class IUPACAlphabet extends Alphabet {
 	 * Enum representing different alphabet types
 	 */
 	public static enum IUPACType {
-		BASEPAIRS, DONTCARES, TWOFOLDSANDN, FULL
+		EMPTY, BASEPAIRS, DONTCARES, TWOFOLDSANDN, FULL
 	}
 
 

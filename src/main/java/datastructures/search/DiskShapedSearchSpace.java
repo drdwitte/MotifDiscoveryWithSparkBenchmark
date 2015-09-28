@@ -16,6 +16,7 @@ public class DiskShapedSearchSpace implements SearchSpace {
     private int maxLength;
     private int maxDegeneratePositions;
     private Alphabet alphabet;
+    private DSNavigator dsNav = null;
 
     /**
      *
@@ -116,7 +117,7 @@ public class DiskShapedSearchSpace implements SearchSpace {
 
         @Override
         public char toSibling() {
-            return siblingNavigators.get(d).next();
+            return  siblingNavigators.get(d).next();
         }
 
         @Override
@@ -134,7 +135,8 @@ public class DiskShapedSearchSpace implements SearchSpace {
 
         @Override
         public boolean inSearchSpace() {
-            throw new NotImplementedException();
+            return d>=minLength && d<=maxLength;
+
         }
 
         @Override

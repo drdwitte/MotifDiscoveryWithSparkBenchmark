@@ -1,6 +1,7 @@
 package datastructures.search;
 
 import datastructures.indexing.DSNavigator;
+import models.motifs.Pattern;
 
 /**
  * Created by ddewitte on 23.09.15.
@@ -16,6 +17,7 @@ public interface SearchSpaceNavigator {
     void toParent();
 
     boolean inSearchSpace();
+    Pattern trail();
 
     /**
      * For a given given search space navigator take a DSNavigator and synchronize
