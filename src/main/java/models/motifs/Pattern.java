@@ -5,4 +5,5 @@ package models.motifs;
  */
 public interface Pattern {
     Pattern clonePattern();
+    int numberOfDegPositions();
 }

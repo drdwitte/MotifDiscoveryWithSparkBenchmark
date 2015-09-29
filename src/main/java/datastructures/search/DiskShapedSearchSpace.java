@@ -1,11 +1,11 @@
 package datastructures.search;
 
 import datastructures.indexing.DSNavigator;
+import factories.PatternFactory;
 import models.alphabets.Alphabet;
 import models.alphabets.CharacterIterator;
+import models.motifs.Pattern;
 import toolbox.NotImplementedException;
-
-import java.util.List;
 
 /**
  * Created by ddewitte on 24.09.15.
@@ -77,37 +77,42 @@ public class DiskShapedSearchSpace implements SearchSpace {
     }
 
     @Override
-    public SearchSpaceNavigator getSSNavigator() {
-        return new IUPACSearchSpaceNavigator() {
-        };
+    public SearchSpaceNavigator getSSNavigator(PatternFactory factory) {
+        return new IUPACSearchSpaceNavigator(factory);
     }
+
+
 
     class IUPACSearchSpaceNavigator implements SearchSpaceNavigator {
 
         //d=0 for root node of search space
         private int d;
-        List<CharacterIterator> siblingNavigators;
+        private CharacterIterator [] siblingNavigators;
+        private Pattern trail;
+
 
         /**
          * Constructor
          */
-        public IUPACSearchSpaceNavigator(){
+        public IUPACSearchSpaceNavigator(PatternFactory factory){
             this.d=0;
-            siblingNavigators.add(new CharacterIterator("")); //root has no siblings
+            siblingNavigators = new CharacterIterator[maxLength];
+            siblingNavigators[0] = new CharacterIterator(""); //root has no siblings
             for (int i=1; i<maxLength; i++){
-                siblingNavigators.add(alphabet.getAllCharsIterator());
+                siblingNavigators[i] = alphabet.getAllCharsIterator();
             }
+            factory.createEmptyMotif();
 
         }
 
         @Override
         public boolean hasSibling() {
-            return siblingNavigators.get(d).hasNext();
+            return siblingNavigators[d].hasNext();
         }
 
         @Override
         public boolean hasChild() {
-            return d<siblingNavigators.size();
+            return d<siblingNavigators.length;
         }
 
         @Override
@@ -117,14 +122,14 @@ public class DiskShapedSearchSpace implements SearchSpace {
 
         @Override
         public char toSibling() {
-            return  siblingNavigators.get(d).next();
+            return  siblingNavigators[d].next();
         }
 
         @Override
         public char toFirstChild() {
             d++;
-            siblingNavigators.get(d).reset();
-            return siblingNavigators.get(d).first();
+            siblingNavigators[d].reset();
+            return siblingNavigators[d].first();
         }
 
         @Override
@@ -134,9 +139,18 @@ public class DiskShapedSearchSpace implements SearchSpace {
         }
 
         @Override
-        public boolean inSearchSpace() {
-            return d>=minLength && d<=maxLength;
+        public boolean largerThanOuterRadius() {
+            return trail.numberOfDegPositions()>maxDegeneratePositions || d>maxLength;
+        }
 
+        @Override
+        public boolean smallerThanInnerRadius() {
+            return d<minLength;
+        }
+
+        @Override
+        public Pattern trail() {
+            return null;
         }
 
         @Override
@@ -150,7 +164,7 @@ public class DiskShapedSearchSpace implements SearchSpace {
         public String toString(){
             StringBuilder sb = new StringBuilder();
             for (int i=0; i<d; i++){
-                sb.append(siblingNavigators.get(d).current());
+                sb.append(siblingNavigators[d].current());
             }
             return sb.toString();
         }

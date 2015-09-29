@@ -16,7 +16,9 @@ public interface SearchSpaceNavigator {
     char toFirstChild();
     void toParent();
 
-    boolean inSearchSpace();
+    boolean largerThanOuterRadius();
+    boolean smallerThanInnerRadius();
+
     Pattern trail();
 
     /**

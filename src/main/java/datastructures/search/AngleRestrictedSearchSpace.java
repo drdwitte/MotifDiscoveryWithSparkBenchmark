@@ -1,5 +1,7 @@
 package datastructures.search;
 
+import factories.PatternFactory;
+import models.alphabets.Alphabet;
 import toolbox.NotImplementedException;
 
 /**
@@ -9,7 +11,10 @@ public class AngleRestrictedSearchSpace implements SearchSpace {
 
 
     @Override
-    public SearchSpaceNavigator getSSNavigator() {
-        throw new NotImplementedException();
-    }
+    public SearchSpaceNavigator getSSNavigator(PatternFactory patternFactory) {
+        throw new NotImplementedException();    }
+
+    @Override
+    public Alphabet getAlphabet() {
+        throw new NotImplementedException();    }
 }

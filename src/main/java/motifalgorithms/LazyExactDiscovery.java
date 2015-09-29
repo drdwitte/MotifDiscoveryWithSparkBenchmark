@@ -4,6 +4,7 @@ import datastructures.indexing.DSNavigator;
 import datastructures.indexing.DiscoveryStructure;
 import datastructures.search.SearchSpace;
 import datastructures.search.SearchSpaceNavigator;
+import factories.PatternFactory;
 import models.motifs.Pattern;
 import motifconservation.INScore;
 import motifconservation.INScoreCalculator;
@@ -23,6 +24,7 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
     private DiscoveryStructure discoveryStructure;
     private INScoreCalculator inScoreCalculator;
     private Function<INScore,Boolean> survivesBranchAndBoundCondition;
+    private PatternFactory patternFactory;
 
     /**
      * Build for discovery algorithm
@@ -33,6 +35,7 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
         private SearchSpace searchSpace;
         private INScoreCalculator inScoreCalculator;
         private Function<INScore,Boolean> survivesBranchAndBoundCondition;
+        private PatternFactory patternFactory;
 
         public Builder discoveryStructure(DiscoveryStructure d){
             this.discoveryStructure=d;
@@ -50,6 +53,10 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
             this.survivesBranchAndBoundCondition=bnb;
             return this;
         }
+        public Builder patternFactory(PatternFactory patternFactory){
+            this.patternFactory=patternFactory;
+            return this;
+        }
 
         public LazyExactDiscovery build(){
 
@@ -64,10 +71,16 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
                     && Checks.survivesNullCheck(this.discoveryStructure)
                     && Checks.survivesNullCheck(this.inScoreCalculator)
                     && Checks.survivesNullCheck(this.survivesBranchAndBoundCondition)
+                    && Checks.survivesNullCheck(this.patternFactory)
 
                     ){}
             else
                 throw new NullPointerException("Not all components initialized");
+
+            if (!patternFactory.getAlphabet().equals(searchSpace.getAlphabet())){
+                throw new NullPointerException("PatternFactory and SearchSpace have incompatible alphabet");
+
+            }
 
             return lazy;
         }
@@ -87,13 +100,11 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
 
         private boolean hasNext = true;
         private Tuple2<Pattern,INScore> currentResult = null;
-        private DSNavigator dsNav = discoveryStructure.getDSNavigator();
-        private SearchSpaceNavigator ssNav = searchSpace.getSSNavigator();
+        private DSNavigator dsNav = discoveryStructure.getDSNavigator(searchSpace.getAlphabet());
+        private SearchSpaceNavigator ssNav = searchSpace.getSSNavigator(patternFactory);
 
         public MotifResultsIterator(){
             initializeIteratorToFirstNode();
-
-            //TODO verify that always at same position in search space
             ssNav.attachDSNavigator(dsNav);
 
         }
@@ -138,23 +149,19 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
 
                 }
 
-                Pattern pattern = dsNav.trail().clonePattern();
-                INScore inScore;
-                if (dsNav.hasMatches()) {
-                    inScore = inScoreCalculator.calc(dsNav.getInfo());
+                if (!ssNav.smallerThanInnerRadius() && dsNav.hasMatches()) {
 
-                    if (ssNav.inSearchSpace()
-                            && survivesBranchAndBoundCondition.apply(inScore)) {
+                    INScore inScore = inScoreCalculator.calc(dsNav.getInfo());
+                    if (survivesBranchAndBoundCondition.apply(inScore)) {
 
+                        Pattern pattern = ssNav.trail().clonePattern();
                         hasNext = true;
                         currentResult = new Tuple2<>(pattern, inScore);
                         found = true;
 
-                    } else {}
-
-                } else {}
-
-
+                    } else {
+                    }
+                }
 
             }
             return result;

@@ -16,6 +16,5 @@ public interface DSNavigator {
 
     INInfo getInfo();
 
-    //FIXME trail moet naar searchPattern
-    //Pattern trail();
+
 }
