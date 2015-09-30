@@ -2,6 +2,8 @@ package factories;
 
 import models.alphabets.Alphabet;
 import models.alphabets.IUPACAlphabet;
+import models.motifs.IUPACPattern;
+import models.motifs.Pattern;
 import toolbox.NotImplementedException;
 
 /**
@@ -12,12 +14,15 @@ public class IUPACFactory implements PatternFactory {
     private Alphabet alphabet;
 
     public IUPACFactory(IUPACAlphabet.IUPACType t){
-        throw new NotImplementedException();
+        new IUPACAlphabet(t);
     }
 
     @Override
-    public void createEmptyMotif() {
-        throw new NotImplementedException();
+    public Pattern createEmptyPattern() {
+
+        return new IUPACPattern();
+
+
     }
 
     @Override

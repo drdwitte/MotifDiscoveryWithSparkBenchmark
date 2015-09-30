@@ -7,6 +7,8 @@ import models.alphabets.CharacterIterator;
 import models.motifs.Pattern;
 import toolbox.NotImplementedException;
 
+import java.util.StringJoiner;
+
 /**
  * Created by ddewitte on 24.09.15.
  */
@@ -52,29 +54,25 @@ public class DiskShapedSearchSpace implements SearchSpace {
     }
 
     public String toString(){
-        StringBuilder b = new StringBuilder();
-        b.append("(");
-        b.append(minLength);
-        b.append(",");
-        b.append(maxLength);
-        b.append(",");
-        b.append(maxDegeneratePositions);
-        b.append(")");
 
-        return b.toString();
+        StringJoiner sj = new StringJoiner(",", "(", ")");
+        sj.add(""+minLength)
+                .add("" + maxLength)
+                .add("" + maxDegeneratePositions);
+        return sj.toString();
     }
 
     /**
      * @return maximum number of basepair strings matching with a motif (for ex.: ANA -> deg=4 -> AAA,ATA,ACA,AGA
      */
-    public int getMaximumDegeneracy() {
+    /*public int getMaximumDegeneracy() {
         int maxDeg = 1;
         for (int i=0; i<maxDegeneratePositions; i++){
             maxDeg*=alphabet.getMaxDegPerChar();
         }
         return maxDeg;
 
-    }
+    }*/
 
     @Override
     public SearchSpaceNavigator getSSNavigator(PatternFactory factory) {
@@ -96,12 +94,12 @@ public class DiskShapedSearchSpace implements SearchSpace {
          */
         public IUPACSearchSpaceNavigator(PatternFactory factory){
             this.d=0;
-            siblingNavigators = new CharacterIterator[maxLength];
+            siblingNavigators = new CharacterIterator[maxLength+1];
             siblingNavigators[0] = new CharacterIterator(""); //root has no siblings
-            for (int i=1; i<maxLength; i++){
+            for (int i=1; i<=maxLength; i++){
                 siblingNavigators[i] = alphabet.getAllCharsIterator();
             }
-            factory.createEmptyMotif();
+            this.trail = factory.createEmptyPattern();
 
         }
 
@@ -112,7 +110,7 @@ public class DiskShapedSearchSpace implements SearchSpace {
 
         @Override
         public boolean hasChild() {
-            return d<siblingNavigators.length;
+            return d<siblingNavigators.length-1;
         }
 
         @Override
@@ -121,20 +119,22 @@ public class DiskShapedSearchSpace implements SearchSpace {
         }
 
         @Override
-        public char toSibling() {
-            return  siblingNavigators[d].next();
+        public void toSibling() {
+            trail.pop();
+            trail.append(siblingNavigators[d].next());
         }
 
         @Override
-        public char toFirstChild() {
+        public void toFirstChild() {
             d++;
             siblingNavigators[d].reset();
-            return siblingNavigators[d].first();
+            trail.append(siblingNavigators[d].first());
         }
 
         @Override
         public void toParent() {
             d--;
+            trail.pop();
 
         }
 
@@ -150,7 +150,7 @@ public class DiskShapedSearchSpace implements SearchSpace {
 
         @Override
         public Pattern trail() {
-            return null;
+            return trail;
         }
 
         @Override

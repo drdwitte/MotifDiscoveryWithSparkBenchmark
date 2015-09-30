@@ -12,8 +12,8 @@ public interface SearchSpaceNavigator {
     boolean hasChild();
     boolean hasParent();
 
-    char toSibling();
-    char toFirstChild();
+    void toSibling();
+    void toFirstChild();
     void toParent();
 
     boolean largerThanOuterRadius();

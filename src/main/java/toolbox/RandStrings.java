@@ -35,7 +35,7 @@ public class RandStrings {
     }
 
     public static int randInt(int width){
-        return (int)Math.random()*width;
+        return (int)(Math.random()*width);
     }
 
     public static Set<String> generateRandomStringset(int size){
