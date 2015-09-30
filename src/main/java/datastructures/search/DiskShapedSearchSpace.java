@@ -7,6 +7,7 @@ import models.alphabets.CharacterIterator;
 import models.motifs.Pattern;
 import toolbox.NotImplementedException;
 
+import java.util.Optional;
 import java.util.StringJoiner;
 
 /**
@@ -18,7 +19,6 @@ public class DiskShapedSearchSpace implements SearchSpace {
     private int maxLength;
     private int maxDegeneratePositions;
     private Alphabet alphabet;
-    private DSNavigator dsNav = null;
 
     /**
      *
@@ -87,7 +87,7 @@ public class DiskShapedSearchSpace implements SearchSpace {
         private int d;
         private CharacterIterator [] siblingNavigators;
         private Pattern trail;
-
+        private Optional<DSNavigator> dsNav = Optional.of(null);
 
         /**
          * Constructor
@@ -121,20 +121,35 @@ public class DiskShapedSearchSpace implements SearchSpace {
         @Override
         public void toSibling() {
             trail.pop();
-            trail.append(siblingNavigators[d].next());
+            char newChar = siblingNavigators[d].next();
+            trail.append(newChar);
+
+            if (dsNav.isPresent()){
+                dsNav.get().backtrack();
+                dsNav.get().jumpTo(newChar);
+            }
         }
 
         @Override
         public void toFirstChild() {
             d++;
             siblingNavigators[d].reset();
-            trail.append(siblingNavigators[d].first());
+            char newChar = siblingNavigators[d].next();
+            trail.append(newChar);
+
+            if (dsNav.isPresent()){
+                dsNav.get().jumpTo(newChar);
+            }
         }
 
         @Override
         public void toParent() {
             d--;
             trail.pop();
+
+            if (dsNav.isPresent()){
+                dsNav.get().backtrack();
+            }
 
         }
 
@@ -155,16 +170,18 @@ public class DiskShapedSearchSpace implements SearchSpace {
 
         @Override
         public void attachDSNavigator(DSNavigator dsNav) {
-            for (int i=0; i<d; i++){
+            if (d==0) {
+                this.dsNav = Optional.ofNullable(dsNav);
+            } else {
+                throw new RuntimeException("Not implemented navigator binding for navs not both @root");
             }
 
-            throw new NotImplementedException();
         }
 
         public String toString(){
             StringBuilder sb = new StringBuilder();
             for (int i=0; i<d; i++){
-                sb.append(siblingNavigators[d].current());
+                sb.append(siblingNavigators[d].toString());
             }
             return sb.toString();
         }

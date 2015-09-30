@@ -110,8 +110,6 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
         }
 
         private void initializeIteratorToFirstNode() {
-            throw new NotImplementedException();
-            //in case of prefix move navigators
         }
 
         public MotifResultsIterator(String prefix){

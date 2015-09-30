@@ -20,6 +20,9 @@ public class CharacterIterator implements Iterator<Character> {
 		return pos < text.length();
 	}
 
+	/**
+	 * @return current character in iteration + increment iterator
+	 */
 	@Override
 	public Character next() {
 		return text.charAt(pos++);
@@ -45,12 +48,11 @@ public class CharacterIterator implements Iterator<Character> {
 		return text.charAt(0);
 	}
 
-	/**
-	 *
-	 * @return current character in iteration
-	 */
-	public char current(){
-		return text.charAt(pos);
+
+	public String toString(){
+		StringBuilder iteratorRepr = new StringBuilder(text);
+		iteratorRepr.insert(pos,"->");
+		return iteratorRepr.toString();
 	}
 
 }

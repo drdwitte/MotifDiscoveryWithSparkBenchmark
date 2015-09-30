@@ -10,12 +10,10 @@ import models.alphabets.IUPACAlphabet;
 
 
 import models.motifs.IUPACPattern;
-import models.motifs.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
 import toolbox.RandStrings;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -111,4 +109,4 @@ public class TestSearchSpace {
         //TODO implement SmallTrie first
 
     }
-cd S}
+}
