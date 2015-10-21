@@ -3,6 +3,7 @@ package models.motifs;
 import models.alphabets.Alphabet;
 import models.alphabets.CharacterIterator;
 import models.alphabets.IUPACAlphabet;
+import models.alphabets.StringIterator;
 
 /**
  * Created by ddewitte on 29.09.15.
@@ -19,7 +20,7 @@ public class IUPACPattern implements Pattern {
 
     public IUPACPattern(String s){
         this.pattern=new StringBuilder(s);
-        calculateNumberOfDegeneratePositions(s);
+        this.numberOfDegeneratePositions=calculateNumberOfDegeneratePositions(s);
     }
 
     private IUPACPattern(String s, int numberOfDegPos){
@@ -28,7 +29,7 @@ public class IUPACPattern implements Pattern {
     }
 
     private int calculateDegeneracy(String s){
-        CharacterIterator iterator = new CharacterIterator(s);
+        CharacterIterator iterator = new StringIterator(s);
         int degeneracy = 1;
         while (iterator.hasNext()){
             degeneracy*=alphabet.getNumberOfMatchingCharacters(iterator.next());
@@ -53,19 +54,20 @@ public class IUPACPattern implements Pattern {
     }
 
 
-    private void calculateNumberOfDegeneratePositions(String s){
-        CharacterIterator iterator = new CharacterIterator(s);
-        numberOfDegeneratePositions = 0;
+    public static int calculateNumberOfDegeneratePositions(String s){
+        CharacterIterator iterator = new StringIterator(s);
+        int numberOfDegeneratePositions = 0;
         while (iterator.hasNext()){
             numberOfDegeneratePositions+=addDegPositionContribution(iterator.next());
         }
+        return numberOfDegeneratePositions;
     }
 
     /**
      * @param c character to be evaluated
      * @return 0 if ACGT or 1 if regex character
      */
-    private int addDegPositionContribution(Character c){
+    private static int addDegPositionContribution(Character c){
         return (alphabet.getNumberOfMatchingCharacters(c)>1)?1:0;
     }
 

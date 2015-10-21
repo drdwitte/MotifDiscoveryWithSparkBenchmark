@@ -4,6 +4,8 @@ import datastructures.indexing.DSNavigator;
 import factories.PatternFactory;
 import models.alphabets.Alphabet;
 import models.alphabets.CharacterIterator;
+import models.alphabets.CharacterIteratorProvider;
+import models.alphabets.StringIterator;
 import models.motifs.Pattern;
 import toolbox.NotImplementedException;
 
@@ -15,10 +17,11 @@ import java.util.StringJoiner;
  */
 public class DiskShapedSearchSpace implements SearchSpace {
 
-    private int minLength;
-    private int maxLength;
-    private int maxDegeneratePositions;
-    private Alphabet alphabet;
+    protected int minLength;
+    protected int maxLength;
+    protected int maxDegeneratePositions;
+    protected Alphabet alphabet;
+    protected CharacterIteratorProvider provider;
 
     /**
      *
@@ -27,11 +30,12 @@ public class DiskShapedSearchSpace implements SearchSpace {
      * @param maxDegPos maximum number of degenerate characters
      * @param alph motif alphabet
      */
-    public DiskShapedSearchSpace(int kmin, int kmax, int maxDegPos, Alphabet alph) {
+    public DiskShapedSearchSpace(int kmin, int kmax, int maxDegPos, Alphabet alph, CharacterIteratorProvider provider) {
         this.minLength=kmin;
         this.maxLength=kmax;
         this.maxDegeneratePositions=maxDegPos;
         this.alphabet=alph;
+        this.provider=provider;
     }
 
     /**
@@ -53,6 +57,21 @@ public class DiskShapedSearchSpace implements SearchSpace {
         return alphabet;
     }
 
+    @Override
+    public boolean test(Pattern p) {
+
+        boolean test = p.length() >= minLength
+                &&  p.length() <= maxLength
+                && p.numberOfDegPositions() <= maxDegeneratePositions
+                ;
+        for (int i=0; i<p.length(); i++){
+            if (!alphabet.contains(p.charAt(i)))
+                return false;
+        }
+        return test;
+
+    }
+
     public String toString(){
 
         StringJoiner sj = new StringJoiner(",", "(", ")");
@@ -62,128 +81,34 @@ public class DiskShapedSearchSpace implements SearchSpace {
         return sj.toString();
     }
 
-    /**
-     * @return maximum number of basepair strings matching with a motif (for ex.: ANA -> deg=4 -> AAA,ATA,ACA,AGA
-     */
-    /*public int getMaximumDegeneracy() {
-        int maxDeg = 1;
-        for (int i=0; i<maxDegeneratePositions; i++){
-            maxDeg*=alphabet.getMaxDegPerChar();
-        }
-        return maxDeg;
-
-    }*/
-
     @Override
     public SearchSpaceNavigator getSSNavigator(PatternFactory factory) {
-        return new IUPACSearchSpaceNavigator(factory);
+         return new DiskShapedSpaceNavigator(factory);
     }
 
-
-
-    class IUPACSearchSpaceNavigator implements SearchSpaceNavigator {
-
-        //d=0 for root node of search space
-        private int d;
-        private CharacterIterator [] siblingNavigators;
-        private Pattern trail;
-        private Optional<DSNavigator> dsNav = Optional.of(null);
+    protected class DiskShapedSpaceNavigator extends ArrayBasedNavigator {
 
         /**
          * Constructor
          */
-        public IUPACSearchSpaceNavigator(PatternFactory factory){
-            this.d=0;
-            siblingNavigators = new CharacterIterator[maxLength+1];
-            siblingNavigators[0] = new CharacterIterator(""); //root has no siblings
-            for (int i=1; i<=maxLength; i++){
-                siblingNavigators[i] = alphabet.getAllCharsIterator();
+        public DiskShapedSpaceNavigator(PatternFactory factory){
+
+            super.siblingNavigators = new CharacterIterator[maxLength+1];
+            super.siblingNavigators[0] = new StringIterator(""); //root has no siblings
+            super.trail = factory.createEmptyPattern();
+        }
+
+        @Override
+        public CharacterIterator getChildIterator() {
+            if (super.trail.numberOfDegPositions() == maxDegeneratePositions){
+                return provider.getExactCharIterator();
             }
-            this.trail = factory.createEmptyPattern();
-
+            return provider.getFullAlphabetIterator();
         }
 
         @Override
-        public boolean hasSibling() {
-            return siblingNavigators[d].hasNext();
-        }
-
-        @Override
-        public boolean hasChild() {
-            return d<siblingNavigators.length-1;
-        }
-
-        @Override
-        public boolean hasParent() {
-            return d>0;
-        }
-
-        @Override
-        public void toSibling() {
-            trail.pop();
-            char newChar = siblingNavigators[d].next();
-            trail.append(newChar);
-
-            if (dsNav.isPresent()){
-                dsNav.get().backtrack();
-                dsNav.get().jumpTo(newChar);
-            }
-        }
-
-        @Override
-        public void toFirstChild() {
-            d++;
-            siblingNavigators[d].reset();
-            char newChar = siblingNavigators[d].next();
-            trail.append(newChar);
-
-            if (dsNav.isPresent()){
-                dsNav.get().jumpTo(newChar);
-            }
-        }
-
-        @Override
-        public void toParent() {
-            d--;
-            trail.pop();
-
-            if (dsNav.isPresent()){
-                dsNav.get().backtrack();
-            }
-
-        }
-
-        @Override
-        public boolean largerThanOuterRadius() {
-            return trail.numberOfDegPositions()>maxDegeneratePositions || d>maxLength;
-        }
-
-        @Override
-        public boolean smallerThanInnerRadius() {
+        public boolean notInSearchSpaceYet() {
             return d<minLength;
-        }
-
-        @Override
-        public Pattern trail() {
-            return trail;
-        }
-
-        @Override
-        public void attachDSNavigator(DSNavigator dsNav) {
-            if (d==0) {
-                this.dsNav = Optional.ofNullable(dsNav);
-            } else {
-                throw new RuntimeException("Not implemented navigator binding for navs not both @root");
-            }
-
-        }
-
-        public String toString(){
-            StringBuilder sb = new StringBuilder();
-            for (int i=0; i<d; i++){
-                sb.append(siblingNavigators[d].toString());
-            }
-            return sb.toString();
         }
     }
 }

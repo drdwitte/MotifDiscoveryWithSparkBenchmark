@@ -16,8 +16,7 @@ public interface SearchSpaceNavigator {
     void toFirstChild();
     void toParent();
 
-    boolean largerThanOuterRadius();
-    boolean smallerThanInnerRadius();
+    boolean notInSearchSpaceYet();
 
     Pattern trail();
 
@@ -28,4 +27,6 @@ public interface SearchSpaceNavigator {
      *              in the SearchSpaceNavigator
      */
     void attachDSNavigator(DSNavigator dsNav);
+
+    void reset();
 }

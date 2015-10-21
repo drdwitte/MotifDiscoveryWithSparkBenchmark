@@ -14,7 +14,7 @@ public class IUPACFactory implements PatternFactory {
     private Alphabet alphabet;
 
     public IUPACFactory(IUPACAlphabet.IUPACType t){
-        new IUPACAlphabet(t);
+        alphabet  = new IUPACAlphabet(t);
     }
 
     @Override

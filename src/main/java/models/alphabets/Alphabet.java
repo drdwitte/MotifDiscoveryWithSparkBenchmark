@@ -36,14 +36,14 @@ public abstract class Alphabet implements Iterable<Character> {
 	 */
 	@Override
 	public Iterator<Character> iterator() {
-		return new CharacterIterator(allChars);
+		return new StringIterator(allChars);
 	}
 
 	/**
 	 * @return Characteriterator for all characters in alphabet
 	 */
 	public CharacterIterator getAllCharsIterator(){
-		return new CharacterIterator(allChars);
+		return new StringIterator(allChars);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public abstract class Alphabet implements Iterable<Character> {
 	 * @return Characteriterator for all dna bases matching with an alphabet character
 	 */
 	public CharacterIterator getMatchingCharactersIterator(Character c){
-		return new CharacterIterator(matchingChars.get(c));
+		return new StringIterator(matchingChars.get(c));
 	}
 
 	/**
@@ -96,5 +96,25 @@ public abstract class Alphabet implements Iterable<Character> {
 	 * @return maximum number of basepairs matching with an alphabet character (for example N=A|C|G|T = 4)
 	 */
 	public abstract int getMaxDegPerChar();
-	
+
+	public boolean contains(Character character){
+		return matchingChars.containsKey(character);
+	}
+
+	@Override
+	public int hashCode() {
+		return allChars.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Alphabet that = (Alphabet) o;
+
+		if (!allChars.equals(that.allChars)) return false;
+
+		return true;
+	}
 }

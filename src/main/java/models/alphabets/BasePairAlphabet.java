@@ -34,16 +34,18 @@ public class BasePairAlphabet extends Alphabet {
 
 	@Override
 	public CharacterIterator degenerateCharsIterator() {
-		return new CharacterIterator("");
+		return new StringIterator("");
 	}
 
 	@Override
 	public CharacterIterator exactCharsIterator() {
-		return new CharacterIterator("ACGT");
+		return new StringIterator("ACGT");
 	}
 
 	@Override
 	public int getMaxDegPerChar() {
 		return 1;
 	}
+
+
 }

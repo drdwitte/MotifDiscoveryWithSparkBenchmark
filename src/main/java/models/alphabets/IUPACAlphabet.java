@@ -114,16 +114,17 @@ public class IUPACAlphabet extends Alphabet {
 
 	@Override
 	public CharacterIterator degenerateCharsIterator() {
-		return new CharacterIterator(degChars);
+		return new StringIterator(degChars);
 	}
 	
 	@Override
 	public CharacterIterator exactCharsIterator() {
-		return new CharacterIterator("ACGT");
+		return new StringIterator("ACGT");
 	}
 
 	@Override
 	public int getMaxDegPerChar() {
 		return maxDegPerChar;
 	}
+
 }

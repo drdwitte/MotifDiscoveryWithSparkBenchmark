@@ -31,8 +31,8 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
      */
     public static class Builder {
 
-        private DiscoveryStructure discoveryStructure;
         private SearchSpace searchSpace;
+        private DiscoveryStructure discoveryStructure;
         private INScoreCalculator inScoreCalculator;
         private Function<INScore,Boolean> survivesBranchAndBoundCondition;
         private PatternFactory patternFactory;
@@ -61,10 +61,12 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
         public LazyExactDiscovery build(){
 
             LazyExactDiscovery lazy = new LazyExactDiscovery();
+
             lazy.searchSpace = this.searchSpace;
             lazy.discoveryStructure = this.discoveryStructure;
             lazy.inScoreCalculator = this.inScoreCalculator;
             lazy.survivesBranchAndBoundCondition = this.survivesBranchAndBoundCondition;
+            lazy.patternFactory=this.patternFactory;
 
             //are  there combinations that do not make sense => exception?
             if (Checks.survivesNullCheck(this.searchSpace)
@@ -76,6 +78,8 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
                     ){}
             else
                 throw new NullPointerException("Not all components initialized");
+
+
 
             if (!patternFactory.getAlphabet().equals(searchSpace.getAlphabet())){
                 throw new NullPointerException("PatternFactory and SearchSpace have incompatible alphabet");
@@ -99,22 +103,25 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
     private class MotifResultsIterator implements Iterator<Tuple2<Pattern, INScore>> {
 
         private boolean hasNext = true;
-        private Tuple2<Pattern,INScore> currentResult = null;
+        private Tuple2<Pattern, INScore> currentResult = null;
         private DSNavigator dsNav = discoveryStructure.getDSNavigator(searchSpace.getAlphabet());
         private SearchSpaceNavigator ssNav = searchSpace.getSSNavigator(patternFactory);
 
-        public MotifResultsIterator(){
-            initializeIteratorToFirstNode();
+        public MotifResultsIterator() {
             ssNav.attachDSNavigator(dsNav);
-
+            initializeIteratorToFirstNode();
         }
+
+        /*private void pr(Object o) {
+            System.out.println(o);
+
+        }*/
+
 
         private void initializeIteratorToFirstNode() {
+            next();
         }
 
-        public MotifResultsIterator(String prefix){
-            throw new NotImplementedException();
-        }
 
         @Override
         public boolean hasNext() {
@@ -128,17 +135,18 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
 
             boolean found = false;
             while (hasNext && !found) {
-
-                if (ssNav.hasChild())
+                if (ssNav.hasChild()) {
                     ssNav.toFirstChild();
 
-                else if (ssNav.hasSibling())
+                } else if (ssNav.hasSibling()){
                     ssNav.toSibling();
 
-                 else {
+                } else {
 
-                    while (!ssNav.hasSibling() && ssNav.hasParent())
+                    while (!ssNav.hasSibling() && ssNav.hasParent()) {
                         ssNav.toParent();
+
+                    }
 
                     if (ssNav.hasParent())
                         ssNav.toSibling();
@@ -147,7 +155,7 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
 
                 }
 
-                if (!ssNav.smallerThanInnerRadius() && dsNav.hasMatches()) {
+                if (!ssNav.notInSearchSpaceYet() && dsNav.hasMatches()) {
 
                     INScore inScore = inScoreCalculator.calc(dsNav.getInfo());
                     if (survivesBranchAndBoundCondition.apply(inScore)) {
@@ -158,7 +166,7 @@ public class LazyExactDiscovery implements LazyMotifDiscoveryAlgorithm {
                         found = true;
 
                     } else {
-                    }
+                    }//FIXME outerbounds?
                 }
 
             }
